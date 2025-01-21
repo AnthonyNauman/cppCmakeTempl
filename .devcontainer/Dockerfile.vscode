@@ -1,0 +1,64 @@
+
+FROM rockdreamer/ubuntu20-gcc10 AS build
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG USERNAME=user
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+ARG CONAN_REVISIONS_ENABLED=1
+
+RUN apt update \
+    && apt -y upgrade \
+    && apt -y autoremove \
+    && apt -y autoclean \
+    && apt install -y --no-install-recommends \
+    cmake gdb python python3-pip \ 
+    ###  [Optional] Mingw for cross-compile for windows
+    binutils-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 \
+    ### [Optional] 
+    # clangd \
+    ### [Optional] 
+    clang-tidy \
+    ### [Optional] Documentation
+    doxygen doxygen-doc graphviz lcov \
+    ### [Optional] File manager and editor
+    mc vim \
+    ### [Optional] FzF or Binocular (in VScode)
+    ripgrep fd-find bat cargo 
+
+    
+    # Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID --create-home $USERNAME --shell /bin/bash \
+    #
+    ### [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo locales \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME \
+    && locale-gen --purge ru_RU.UTF-8 && echo 'LANG=ru_RU.UTF-8' > /etc/default/locale \
+    && echo 'export LC_ALL=ru_RU.UTF-8' > /home/$USERNAME/.bashrc   \
+    && echo "export TERM=xterm-256color" >> /home/$USERNAME/.bashrc \
+    && echo 'export PATH="$PATH:/home/user/.cargo/bin/:/home/user/.local/bin/"' >> /home/$USERNAME/.bashrc \ 
+    && echo 'alias kj="kill -9 $(jobs -p)"' >> /home/$USERNAME/.bashrc \
+    && echo 'alias sup="git submodule update --init --recursive"' >> /home/$USERNAME/.bashrc
+
+
+    
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+USER $USERNAME
+# USER root
+
+RUN cd /home/$USERNAME \
+&& git config --global --add safe.directory '*'
+
+# can download repos from git
+RUN mkdir -p ~/.local/bin && ln -s /usr/bin/batcat ~/.local/bin/bat
+
+RUN cargo install binocular-cli 
+RUN mkdir /home/$USERNAME/share
+RUN /usr/bin/python3 -m pip install --upgrade pip   
+# [Optional] Formatting
+RUN pip3 install clang-format
+
+RUN pip3 install conan==2.0 && conan profile detect --force && conan remote add conancenter2 https://center2.conan.io
