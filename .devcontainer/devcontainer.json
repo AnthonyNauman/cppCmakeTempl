@@ -11,8 +11,12 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	"features": {
-		"ghcr.io/devcontainers-extra/features/fzf:1": {}
-	},
+		// 	"ghcr.io/devcontainers-extra/features/fzf:1": {}
+        "git": "os-provided",
+        "sshd": "latest"
+    },
+	// "features": {
+	// },
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Uncomment the next line to run commands after the container is created.
@@ -20,7 +24,7 @@
 	// Mount folder
 	"mounts": [
 	    {
-	        "source": "/home/user/share",
+	        "source": "/home/antony/share",
 	        "target": "/home/user/share",
 	        "type": "bind"
 	    },
@@ -32,21 +36,24 @@
 				// Paths
 				"cmake.buildDirectory": "/workspaces/${workspaceFolderBasename}/build",
 				"cmake.cmakePath": "/usr/bin/cmake",
+				// "cmake.additionalCompilerSearchDirs": ["/usr/bin/", "/usr/share/"],
+				// "cmake.ignoreCMakeListsMissing": true,
+				"cmake.exportCompileCommandsFile": true,
+				// "cmake.generator": "Ninja",
     			"format-modified.executable": "/usr/local/bin/clang-format"
 			},
 			"extensions": [
-				"jpcrs.binocular",
-				"gruntfuggly.format-modified",
 				"ms-azuretools.vscode-docker",
-				"aaron-bond.better-comments",
 				"ms-vscode.cpptools-extension-pack",
-				"eamodio.gitlens",
+                "ms-vscode.cpptools",
+                "eamodio.gitlens",
+                "ms-vscode.cmake-tools",
+                "jacobdufault.fuzzy-search",
+                "joshmu.periscope",
+                "matepek.vscode-catch2-test-adapter",
+                "gruntfuggly.format-modified",
+				"tobias-z.vscode-harpoon",
 				"mhutchie.git-graph",
-				"matepek.vscode-catch2-test-adapter"
-				// "twxs.cmake",
-				// "ms-vscode.cmake-tools",
-				// "augustocdias.tasks-shell-input",
-				// "llvm-vs-code-extensions.vscode-clangd",
 			]
 		}
 	},
