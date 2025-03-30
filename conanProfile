@@ -12,3 +12,7 @@ shared=False
 build_gmock=True
 hide_symbols=False
 disable_pthreads=False
+
+[conf]
+tools.cmake.cmaketoolchain:generator=Ninja
+tools.system.package_manager:mode=install

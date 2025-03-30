@@ -12,9 +12,9 @@ RUN apt update \
     && apt -y autoremove \
     && apt -y autoclean \
     && apt install -y --no-install-recommends \
-    cmake gdb python python3-pip \ 
     ###  [Optional] Mingw for cross-compile for windows
     binutils-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 \
+    ninja-build build-essential \
     ### [Optional] 
     # clangd \
     ### [Optional] 
@@ -22,9 +22,10 @@ RUN apt update \
     ### [Optional] Documentation
     doxygen doxygen-doc graphviz lcov \
     ### [Optional] File manager and editor
-    mc vim \
+    # mc vim \
     ### [Optional] FzF or Binocular (in VScode)
-    ripgrep fd-find bat cargo 
+    # ripgrep fd-find bat cargo 
+    cmake python python3-pip 
 
     
     # Create the user
@@ -49,16 +50,18 @@ RUN groupadd --gid $USER_GID $USERNAME \
 USER $USERNAME
 # USER root
 
-RUN cd /home/$USERNAME \
-&& git config --global --add safe.directory '*'
-
 # can download repos from git
-RUN mkdir -p ~/.local/bin && ln -s /usr/bin/batcat ~/.local/bin/bat
+RUN cd /home/$USERNAME \
+    && git config --global --add safe.directory '*'
 
-RUN cargo install binocular-cli 
+# RUN mkdir -p ~/.local/bin && ln -s /usr/bin/batcat ~/.local/bin/bat
+
+# RUN cargo install binocular-cli 
 RUN mkdir /home/$USERNAME/share
-RUN /usr/bin/python3 -m pip install --upgrade pip   
-# [Optional] Formatting
-RUN pip3 install clang-format
-
-RUN pip3 install conan==2.0 && conan profile detect --force && conan remote add conancenter2 https://center2.conan.io
+RUN /usr/bin/python3 -m pip install --upgrade pip && \  
+    # [Optional] Formatting
+    pip3 install clang-format && \
+    # Conan
+    pip3 install conan==2.2 && \
+    conan profile detect --force && \
+    conan remote add conancenter2 https://center2.conan.io
